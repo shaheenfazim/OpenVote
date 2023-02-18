@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>OpenVote | A Blockbain Voting System</title>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Ubuntu', sans-serif;
+            margin-bottom: 5vh;
+        }
+        
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.5rem;
+        }
+        
+        .navbar {
+            height: 10vh;
+        }
+        
+        .page {
+            padding-top: 1vh;
+            height: 85vh;
+            background-color: aliceblue;
+            border-radius: 5vh;
+        }
+        
+        .btn-primary {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .status,
+        .option {
+            padding: 5vh;
+            border: 0px;
+            border-radius: 20px;
+        }
+        
+        .option:hover {
+            background-color: aquamarine;
+            cursor: pointer;
+        }
+        
+        .card-body>.material-icons {
+            font-size: 7.5rem;
+            color: aquamarine;
+            background-color: aliceblue;
+            border-radius: 100px;
+        }
+        
+        .navbar-brand>span {
+            color: rgb(70, 70, 70);
+        }
+        
+        .tab-content {
+            padding: 5vh 0;
+        }
+        
+        .login-page {
+            padding-top: 20vh;
+        }
+        
+        .login-page>.card {
+            padding: 10vh 5vh 2.5vh 5vh;
+            border: 0px;
+            border-radius: 20px;
+        }
+        
+        .login-page>.card>.material-icons {
+            font-size: 10rem;
+            color: aquamarine;
+            background-color: aliceblue;
+            border-radius: 100px;
+        }
+        
+        .disable-btn {
+            filter: grayscale(100%);
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar container">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="./assets/logo.svg" alt="Logo" width="30" height="30" class="d-inline-block align-text-top"> OpenVote <span>Admin</span>
+            </a>
+
+            <!-- Connection Indicator -->
+            <div style="display: flex; align-items: center;padding: 5px;color: grey;border-radius: 10px;border: 2px solid aliceblue;">
+                <div style="width: 10px; height: 10px; border-radius: 50%; background-color: gainsboro;" id="connectInd"></div>
+                <span style="display: inline-block; margin-left: 5px;" id="connectTxt">Not connected</span>
+            </div>
+
+        </div>
+    </nav>
+    <div class="page container">
+        <div class="row login-page" style="display: block;" id="loginPage">
+            <div class="card text-center col-md-6 mx-auto" style="width: 25rem;">
+                <span class="material-icons position-absolute top-0 start-50 translate-middle">
+                    account_circle
+                    </span>
+                <div class="card-body">
+                    <h5 class="card-title">Connect Your Wallet</h5>
+                    <p class="card-text">To manage voting, connect the wallet address that was used to create the smart contract.</p>
+
+                    <div class="d-grid gap-2">
+                        <button onclick="connectMetamask()" class="btn btn-primary" type="button">Connect</button>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+        <div class="container" style="display: none;" id="panelPage">
+            <div class="row p-2">
+                <div class="col-md-12 mb-3 p-3">
+                    <div class="card text-center status" style="height: 25vh;">
+                        <div class="card-body">
+                            <code class="card-title h1" id="Status">Voting is Active</code>
+                            <br><br>
+                            <small class="card-text text-muted" id="subStatus"></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3 p-3">
+                    <div class="card text-center h-100 option disable-this" data-bs-toggle="modal" data-bs-target="#candidate">
+                        <div class="card-body">
+                            <span class="material-icons">
+                                    ballot
+                                    </span>
+                            <h5 class="card-title">Manage Candidates</h5>
+                            <p class="card-text">Add Candidates and Fetch List.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3 p-3">
+                    <div class="card text-center h-100 option disable-this" data-bs-toggle="modal" data-bs-target="#voter">
+                        <div class="card-body">
+                            <span class="material-icons">
+                                    post_add
+                                    </span>
+                            <h5 class="card-title">Manage Voters</h5>
+                            <p class="card-text">Add Voter and Show Votes.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3 p-3">
+                    <div class="card text-center h-100 option disable-this" data-bs-toggle="modal" data-bs-target="#endvote">
+                        <div class="card-body">
+                            <span class="material-icons">
+                                    unpublished
+                                    </span>
+                            <h5 class="card-title">End Voting</h5>
+                            <p class="card-text">End Current Voting Sesion.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3 p-3">
+                    <div class="card text-center h-100 option">
+                        <div class="card-body" onclick="showWinner()">
+                            <span class="material-icons">
+                                    emoji_events
+                                    </span>
+                            <h5 class="card-title">Show Winner</h5>
+                            <p class="card-text">Display winner in the status.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal For Candidate -->
+        <div class="modal fade" id="candidate" tabindex="-1" aria-labelledby="candidateLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-body">
+
+
+                        <nav>
+                            <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                                <button class="nav-link active" id="nav-addc-tab" data-bs-toggle="tab" data-bs-target="#nav-addc" type="button" role="tab" aria-controls="nav-addc" aria-selected="true">Add Candidates</button>
+                                <button onclick="getList()" class="nav-link" id="nav-showc-tab" data-bs-toggle="tab" data-bs-target="#nav-showc" type="button" role="tab" aria-controls="nav-showc" aria-selected="false">Fetch Candidates List</button>
+
+                            </div>
+                        </nav>
+                        <div class="tab-content" id="nav-tabContent">
+                            <div class="tab-pane fade show active" id="nav-addc" role="tabpanel" aria-labelledby="nav-addc-tab" tabindex="0">
+
+
+                                <h5 class="card-title">Enter Candidate Name</h5>
+                                <p class="card-text">Enter the name of the candidate that you would like to store in the contract.</p>
+                                <input type="text" class="form-control" id="candidateName" placeholder="Name">
+                                <br>
+                                <a href="#" class="btn btn-primary" onclick="setCanditates()">Add Candidate</a>
+
+                            </div>
+                            <div class="tab-pane fade" id="nav-showc" role="tabpanel" aria-labelledby="nav-showc-tab" tabindex="0">
+                                <ul class="list-group list-group-numbered" id="writeList">
+                                </ul>
+                            </div>
+
+                        </div>
+
+                        <div class="text-end">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal For Voter-->
+        <div class="modal fade" id="voter" tabindex="-1" aria-labelledby="voterLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-body">
+
+                        <nav>
+                            <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                                <button class="nav-link active" id="nav-addv-tab" data-bs-toggle="tab" data-bs-target="#nav-addv" type="button" role="tab" aria-controls="nav-addv" aria-selected="true">Add Voter</button>
+                                <button onclick="totVotes()" class="nav-link" id="nav-showv-tab" data-bs-toggle="tab" data-bs-target="#nav-showv" type="button" role="tab" aria-controls="nav-showv" aria-selected="false">Fetch Total Votes</button>
+
+                            </div>
+                        </nav>
+                        <div class="tab-content" id="nav-tabContent">
+                            <div class="tab-pane fade show active" id="nav-addv" role="tabpanel" aria-labelledby="nav-addv-tab" tabindex="0">
+
+                                <h5 class="card-title">Enter Voter Public Address</h5>
+                                <p class="card-text">Enter the voter's public address to confirm their eligibility to vote.</p>
+                                <input type="email" class="form-control" id="voterAddr" placeholder="Voter Public Address">
+                                <br>
+                                <a href="#" class="btn btn-primary" onclick="setVoters()">Add Voter</a>
+
+                            </div>
+                            <div class="tab-pane fade text-center" id="nav-showv" role="tabpanel" aria-labelledby="nav-showv-tab" tabindex="0">
+                                <code class="h3" id="totalVote"></code>
+                            </div>
+
+                        </div>
+
+
+                        <div class="text-end">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal For Ending-->
+        <div class="modal fade" id="endvote" tabindex="-1" aria-labelledby="endvoteLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="h5 p-3">Are you sure you want to conclude the voting session?</div>
+
+                        <div class="text-end">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="concludeVoting()">Continue</button>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+<script type="text/javascript" src="./assets/contract.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+
+</html>

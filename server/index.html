@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>OpenVote | A Blockbain Voting System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
+    <style>
+        body {
+            font-family: 'Ubuntu', sans-serif;
+            margin-bottom: 5vh;
+        }
+        
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.5rem;
+        }
+        
+        .navbar {
+            height: 10vh;
+        }
+        
+        .page {
+            height: 85vh;
+            background-color: aliceblue;
+            border-radius: 5vh;
+        }
+        
+        .btn-primary {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .navbar-brand>span {
+            color: rgb(70, 70, 70);
+        }
+        
+        .login-page {
+            padding-top: 20vh;
+        }
+        
+        .login-page>.card {
+            padding: 10vh 5vh 2.5vh 5vh;
+            border: 0px;
+            border-radius: 20px;
+        }
+        
+        .login-page>.card>.material-icons {
+            font-size: 10rem;
+            color: aquamarine;
+            background-color: aliceblue;
+            border-radius: 100px;
+        }
+        
+        .option {
+            padding: 1.5vh;
+            border: 0px;
+            border-radius: 20px;
+        }
+        
+        .option:hover {
+            background-color: aquamarine;
+            cursor: pointer;
+        }
+        
+        .col-md-4>.material-icons {
+            font-size: 5rem;
+            color: aquamarine;
+            background-color: aliceblue;
+            border-radius: 100px;
+        }
+        
+        select:-internal-list-box option:checked {
+            background-color: aquamarine !important;
+        }
+        
+        .disable-btn {
+            filter: grayscale(100%);
+            pointer-events: none;
+        }
+        
+        #candidate-list {
+            height: 40vh;
+            background-color: white;
+            overflow: auto;
+        }
+        
+        #candidate-list>li:hover {
+            cursor: pointer;
+        }
+        
+        #candidate-list>.selected {
+            background-color: aquamarine;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar container">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="./assets/logo.svg" alt="Logo" width="30" height="30" class="d-inline-block align-text-top"> OpenVote <span>Voter</span>
+            </a>
+
+            <!-- Connection Indicator -->
+            <div style="display: flex; align-items: center;padding: 5px;color: grey;border-radius: 10px;border: 2px solid aliceblue;">
+                <div style="width: 10px; height: 10px; border-radius: 50%; background-color: gainsboro;" id="connectInd"></div>
+                <span style="display: inline-block; margin-left: 5px;" id="connectTxt">Not connected</span>
+            </div>
+
+        </div>
+    </nav>
+    <div class="page container">
+        <div class="row login-page" style="display: block;" id="loginPage">
+            <div class="card text-center col-md-6 mx-auto" style="width: 25rem;">
+                <span class="material-icons position-absolute top-0 start-50 translate-middle">
+                    account_circle
+                    </span>
+                <div class="card-body">
+                    <h5 class="card-title">Connect Your Wallet</h5>
+                    <p class="card-text">To start voting, please connect your Wallet. Make sure that your public key has been added to the voter list.</p>
+
+                    <div class="d-grid gap-2">
+                        <button onclick="connectMetamask()" class="btn btn-primary" type="button">Connect</button>
+                      </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div style="display: none;" id="panelPage">
+
+
+
+            <div class="row align-items-end">
+                <div class="col-md-12 mb-3 p-5 h3">
+
+
+                    <ul class="list-group list-group-numbered" id="candidate-list">
+
+                    </ul>
+                </div>
+                <div class="col-sm-6 p-5">
+                    <div class="card h-100 option" onclick="getCandidates()">
+                        <div class="row g-0">
+                            <div class="col-md-4">
+                                <span class="material-icons">
+                                    cloud_sync
+                                    </span>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title">Refresh List</h5>
+                                    <p class="card-text"><small class="text-muted">Click here to fetch the Candidate list.</small></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 p-5">
+                    <div class="card h-100 option disable-this" onclick="vote()" id="changeBtn">
+                        <div class="row g-0">
+                            <div class="col-md-4">
+                                <span class="material-icons">
+                                    how_to_vote
+                                    </span>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title">Vote Candidate</h5>
+                                    <p class="card-text"><small class="text-muted">Vote selected candidate from the list.</small></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+    </div>
+
+    <input id="subStatus" hidden>
+    <input id="Status" hidden>
+</body>
+<script>
+    // Get the <ul> element that contains the list items
+    document.getElementById("changeBtn").classList.add("disable-btn");
+    var ul = document.getElementById('candidate-list');
+
+    // Add a click event listener to the <ul> element
+    ul.addEventListener('click', function(event) {
+        // Get the clicked list item
+        var clickedLi = event.target;
+
+        // Check if the clicked element is a list item
+        if (clickedLi.tagName === 'LI') {
+            document.getElementById("changeBtn").classList.remove("disable-btn");
+            // Remove the selected class from all list items
+            var lis = ul.getElementsByTagName('li');
+            for (var i = 0; i < lis.length; i++) {
+                lis[i].classList.remove('selected');
+            }
+
+            // Add the selected class to the clicked list item
+            clickedLi.classList.add('selected');
+        }
+    });
+</script>
+<script type="text/javascript" src="./assets/contract.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+
+</html>
