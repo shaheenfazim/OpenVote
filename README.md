@@ -18,4 +18,12 @@ OpenVote is a secure voting application built on blockchain technology. It inclu
 
 Please note that this is currently under development and may not be ready for use in a production environment. We welcome any feedback and contributions from the community to help improve this project.
 
+
+
+
+https://user-images.githubusercontent.com/21116180/219931401-c6fc7b85-6d73-4e7a-8020-b0baed0b4da2.mp4
+
+
+
+
 Thank you for your interest in OpenVote!
