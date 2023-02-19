@@ -8,6 +8,8 @@ OpenVote is a secure voting application built on blockchain technology. It inclu
 - Metamask - https://metamask.io/
 - Ganache - https://trufflesuite.com/ganache/
 - Remix Ethereum IDE - https://remix.ethereum.org/
+- Bootstrap v5.3
+- web3.js - Ethereum JavaScript API
 
 ## Usage:
 1. Download and create a testnet using Ganache
