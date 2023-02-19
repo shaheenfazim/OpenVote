@@ -24,6 +24,3 @@ Please note that this is currently under development and may not be ready for us
 https://user-images.githubusercontent.com/21116180/219931401-c6fc7b85-6d73-4e7a-8020-b0baed0b4da2.mp4
 
 
-
-
-Thank you for your interest in OpenVote!
